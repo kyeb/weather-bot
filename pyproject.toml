@@ -9,6 +9,7 @@ package-mode = false
 [tool.poetry.dependencies]
 python = "^3.12"
 sinch = "^1.0.0"
+flask = "^3.0.3"
 
 
 [build-system]
