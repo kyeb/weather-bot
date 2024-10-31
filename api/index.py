@@ -2,21 +2,12 @@ import os
 import sys
 import re
 import sinch
-import logging
 import requests
 from datetime import datetime, timedelta
 from flask import Flask, request
 from dotenv import load_dotenv
 
 load_dotenv()
-
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s [%(levelname)s] %(message)s',
-    datefmt='%Y-%m-%d %H:%M:%S',
-    stream=sys.stdout
-)
-logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 
@@ -58,7 +49,7 @@ def get_weather_forecast(lat, lon):
         response.raise_for_status()
         return response.json()
     except Exception as e:
-        logger.error(f"Failed to fetch weather data: {str(e)}")
+        print(f"ERROR: failed to fetch weather data: {str(e)}")
         return None
 
 def format_hourly_forecast(data):
@@ -96,15 +87,13 @@ def get_sinch_client():
     key_secret = os.getenv('SINCH_KEY_SECRET')
     project_id = os.getenv('SINCH_PROJECT_ID')
     
-    logger.info(f"Attempting to initialize Sinch client with project_id: {project_id}")
-    
     if not all([key_id, key_secret, project_id]):
         missing = [k for k, v in {
             'SINCH_KEY_ID': key_id,
             'SINCH_KEY_SECRET': key_secret,
             'SINCH_PROJECT_ID': project_id
         }.items() if not v]
-        logger.error(f"Missing environment variables: {missing}")
+        print(f"ERROR: Missing environment variables: {missing}")
         raise ValueError(f"Missing required environment variables: {missing}")
     
     return sinch.SinchClient(
@@ -124,11 +113,11 @@ def receive_sms():
     try:
         sinch_client = get_sinch_client()
     except Exception as e:
-        logger.error(f"Failed to initialize Sinch client: {str(e)}")
+        print(f"ERROR: Failed to initialize Sinch client: {str(e)}")
         return f"Configuration error: {str(e)}", 500
 
     inbound_message = request.get_json()
-    logger.info(f"Received inbound message: {inbound_message}")
+    print(f"INFO: Received inbound message: {inbound_message}")
     
     if all(key in inbound_message for key in ["body", "to", "from"]):
         try:
@@ -154,19 +143,19 @@ def receive_sms():
                 to=[inbound_message["from"]],
                 from_=inbound_message["to"]
             )
-            logger.info(f"Successfully sent message, batch id: {response.id}")
+            print(f"INFO: Successfully sent message, batch id: {response.id}")
             return "Inbound message received", 200
         except Exception as e:
-            logger.error(f"Failed to send SMS: {str(e)}")
+            print(f"ERROR: Failed to send SMS: {str(e)}")
             return "Internal server error", 500
     else:
-        logger.warning(f"Received invalid message format. Missing required fields. Message: {inbound_message}")
+        print(f"ERROR: Received invalid message format. Missing required fields. Message: {inbound_message}")
         return "Invalid data", 400
 
 @app.route('/sms/delivery_report', methods=['POST'])
 def delivery_report():
     report = request.get_json()
-    logger.info(f"Message delivered: {report}")
+    print(f"INFO: Message delivered: {report}")
     return "OK", 200
 
 @app.route('/', methods=['GET'])
@@ -175,5 +164,5 @@ def health_check():
         sinch_client = get_sinch_client()
         return "Configuration OK", 200
     except Exception as e:
-        logger.error(f"Health check failed: {str(e)}")
+        print(f"ERROR: Health check failed: {str(e)}")
         return f"Configuration error: {str(e)}", 500
