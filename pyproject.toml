@@ -10,6 +10,7 @@ package-mode = false
 python = "^3.12"
 sinch = "^1.0.0"
 flask = "^3.0.3"
+python-dotenv = "^1.0.1"
 
 
 [build-system]
