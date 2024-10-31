@@ -1,4 +1,5 @@
 import os
+import sys
 import re
 import sinch
 import logging
@@ -12,7 +13,8 @@ load_dotenv()
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s [%(levelname)s] %(message)s',
-    datefmt='%Y-%m-%d %H:%M:%S'
+    datefmt='%Y-%m-%d %H:%M:%S',
+    stream=sys.stdout
 )
 logger = logging.getLogger(__name__)
 
