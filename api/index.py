@@ -38,8 +38,8 @@ def get_sinch_client():
         project_id=project_id
     )
 
-@app.route('/', methods=['POST'])
-def result():
+@app.route('/sms', methods=['POST'])
+def receive_sms():
     try:
         sinch_client = get_sinch_client()
     except Exception as e:
