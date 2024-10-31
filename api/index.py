@@ -38,7 +38,7 @@ def get_sinch_client():
         project_id=project_id
     )
 
-@app.route('/sms', methods=['POST'])
+@app.route('/sms/receive', methods=['POST'])
 def receive_sms():
     try:
         sinch_client = get_sinch_client()
@@ -67,6 +67,11 @@ def receive_sms():
         logger.warning(f"Received invalid message format. Missing required fields. Message: {inbound_message}")
         return "Invalid data", 400
 
+@app.route('/sms/delivery_report', methods=['POST'])
+def delivery_report():
+    report = request.get_json()
+    logger.info(f"Message delivered: {report}")
+
 @app.route('/', methods=['GET'])
 def health_check():
     try:
@@ -75,3 +80,4 @@ def health_check():
     except Exception as e:
         logger.error(f"Health check failed: {str(e)}")
         return f"Configuration error: {str(e)}", 500
+
