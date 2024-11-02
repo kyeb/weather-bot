@@ -130,7 +130,7 @@ def receive_sms():
             
             response = sinch_client.sms.batches.send(
                 body=response_text,
-                delivery_report="none",
+                delivery_report="per_recipient",
                 to=[inbound_message["from"]],
                 from_=inbound_message["to"]
             )
