@@ -134,7 +134,7 @@ def receive_sms():
                 to=[inbound_message["from"]],
                 from_=inbound_message["to"]
             )
-            log_info(f"Successfully sent message, batch id: {response.id}")
+            log_info(f"Successfully sent message! Response: {response}")
             return "Inbound message received", 200
         except Exception as e:
             log_error(f"Failed to send SMS: {str(e)}")
